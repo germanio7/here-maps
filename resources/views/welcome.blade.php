@@ -76,7 +76,7 @@ function calculateRouteFromAtoB(platform) {
         // via: '-27.21438,-61.18795',
         destination: '-27.46056,-58.98389',
         // return: 'polyline,turnByTurnActions,actions,instructions,travelSummary',
-        return: 'polyline,turnByTurnActions,actions,instructions,travelSummary',
+        return: 'polyline,travelSummary',
       };
 
   router.calculateRoute(
@@ -93,6 +93,7 @@ function calculateRouteFromAtoB(platform) {
  * see: http://developer.here.com/rest-apis/documentation/routing/topics/resource-type-calculate-route.html
  */
 function onSuccess(result) {
+    // console.log(result.routes);
   var route = result.routes[0];
 
   /*
@@ -102,8 +103,8 @@ function onSuccess(result) {
    */
   addRouteShapeToMap(route);
   addManueversToMap(route);
-  addWaypointsToPanel(route);
-  addManueversToPanel(route);
+//   addWaypointsToPanel(route);
+//   addManueversToPanel(route);
   addSummaryToPanel(route);
   // ... etc.
 }
@@ -204,40 +205,37 @@ function addRouteShapeToMap(route) {
  * @param {Object} route A route as received from the H.service.RoutingService
  */
 function addManueversToMap(route) {
-  var svgMarkup = '<svg width="18" height="18" ' +
-    'xmlns="http://www.w3.org/2000/svg">' +
-    '<circle cx="8" cy="8" r="8" ' +
-      'fill="#1b468d" stroke="white" stroke-width="1" />' +
-    '</svg>',
-    dotIcon = new H.map.Icon(svgMarkup, {anchor: {x:8, y:8}}),
-    group = new H.map.Group(),
-    i,
-    j;
-
+  
   route.sections.forEach((section) => {
     let poly = H.geo.LineString.fromFlexiblePolyline(section.polyline).getLatLngAltArray();
 
-    console.log(poly)
 
-    let actions = section.actions;
-    // Add a marker for each maneuver
-    for (i = 0; i < actions.length; i += 1) {
-      let action = actions[i];
-      var marker = new H.map.Marker({
-        lat: poly[action.offset * 3],
-        lng: poly[action.offset * 3 + 1]},
-        {icon: dotIcon});
-      marker.instruction = action.instruction;
-      group.addObject(marker);
-    }
+    let lat = -27.180250000000022;
+    let long = -59.33659000000001;
 
-    group.addEventListener('tap', function (evt) {
+    if (poly.indexOf(lat) >= 0 & poly.indexOf(long) >= 0) {
+        var svgCustom = `<svg xmlns="http://www.w3.org/2000/svg" style="color: red;" width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+</svg>`,
+        dotIconCustom = new H.map.Icon(svgCustom, {anchor: {x:8, y:8}}),
+        group = new H.map.Group(),
+        i,
+        j;
+
+        var marker = new H.map.Marker({
+            lat: lat,
+            lng: long},
+            {icon: dotIconCustom});
+        marker.instruction = 'Peaje Makalle Precio $100';
+        group.addObject(marker);
+
+        group.addEventListener('tap', function (evt) {
       map.setCenter(evt.target.getGeometry());
       openBubble(evt.target.getGeometry(), evt.target.instruction);
     }, false);
 
-    // Add the maneuvers group to the map
     map.addObject(group);
+    }
   });
 }
 
