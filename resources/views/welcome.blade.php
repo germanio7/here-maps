@@ -2,63 +2,128 @@
 <html>
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-    <title>Test</title>
-    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
-    <link rel="stylesheet" type="text/css" href="demo.css" />
-    <link rel="stylesheet" type="text/css" href="styles.css" />
-    <link rel="stylesheet" type="text/css" href="../template.css" />
-    <script type="text/javascript" src='../test-credentials.js'></script>
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
-    <style type="text/css">
-        .directions li span.arrow {
-            display: inline-block;
-            min-width: 28px;
-            min-height: 28px;
-            background-position: 0px;
-            background-image: url("https://heremaps.github.io/maps-api-for-javascript-examples/map-with-route-from-a-to-b/img/arrows.png");
-            position: relative;
-            top: 8px;
-        }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <title>Easytrip</title>
+  <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+  <link rel="stylesheet" type="text/css" href="demo.css" />
+  <link rel="stylesheet" type="text/css" href="styles.css" />
+  <link rel="stylesheet" type="text/css" href="../template.css" />
+  <script type="text/javascript" src='../test-credentials.js'></script>
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+  <script src="{{ mix('js/app.js') }}" defer></script>
+  <style type="text/css">
+    .directions li span.arrow {
+      display: inline-block;
+      min-width: 28px;
+      min-height: 28px;
+      background-position: 0px;
+      background-image: url("https://heremaps.github.io/maps-api-for-javascript-examples/map-with-route-from-a-to-b/img/arrows.png");
+      position: relative;
+      top: 8px;
+    }
 
-        .directions li span.depart {
-            background-position: -28px;
-        }
+    .directions li span.depart {
+      background-position: -28px;
+    }
 
-        .directions li span.rightturn {
-            background-position: -224px;
-        }
+    .directions li span.rightturn {
+      background-position: -224px;
+    }
 
-        .directions li span.leftturn {
-            background-position: -252px;
-        }
+    .directions li span.leftturn {
+      background-position: -252px;
+    }
 
-        .directions li span.arrive {
-            background-position: -1288px;
-        }
-    </style>
-    <script>
-        window.ENV_VARIABLE = 'developer.here.com'
-    </script>
-    <script src='../iframeheight.js'></script>
+    .directions li span.arrive {
+      background-position: -1288px;
+    }
+  </style>
+  <script>
+    window.ENV_VARIABLE = 'developer.here.com'
+  </script>
+  <script src='../iframeheight.js'></script>
 </head>
 
 <body id="markers-on-the-map">
 
-    <div id="map" style="width: 88rem; height: 40rem;"></div>
-    <div id="panel"></div>
+  <div>
+    <label for="start">Inicio</label>
+    <input type="search" name="" id="start" value="Villa Angela">
+    <label for="end">Destino</label>
+    <input type="search" name="" id="end" value="Resistencia">
+    <button onclick="searchAddress()">ir</button>
+    <div class="loader"></div>
+  </div>
+  <div id="map" style="width: 88rem; height: 40rem;"></div>
+  <div id="panel"></div>
 
-    <script type="text/javascript" src='demo.js'></script>
+  <script type="text/javascript" src='demo.js'></script>
 </body>
 
 </html>
 
 <script>
-    /**
+
+  function testing() {
+    axios.get('/api/near')
+    .then((res)=>{
+      console.log(res.data);
+    })
+  }
+
+  var origen = '';
+  var destino = '';
+  var total = 0;
+  const casetas = [
+        {
+            id: 1,
+            name: "Caseta 1",
+            lat: -27.180250000000,
+            lng: -59.336590000000,
+            price: 100.00
+        },
+        {
+            id: 2,
+            name: "Caseta 2",
+            lat: -26.87504,
+            lng: -60.241589999999,
+            price: 190.00
+        },
+        {
+            id: 3,
+            name: "Caseta 3",
+            lat: 19.508876,
+            lng: -99.236592,
+            price: 75.00
+        },
+        {
+            id: 4,
+            name: "Caseta 4",
+            lat: 19.47013,
+            lng: -99.22682,
+            price: 75.00
+        },
+        {
+            id: 5,
+            name: "Peaje",
+            lat: -27.1867896,
+            lng: -59.3264541,
+            price: 99.00
+        },
+        {
+            id: 6,
+            name: "Caseta 6",
+            lat: -27.18025,
+            lng: -59.33659,
+            price: 55.00
+        },
+    ]
+  
+  /**
  * Calculates and displays a car route from the Brandenburg Gate in the centre of Berlin
  * to Friedrichstraße Railway Station.
  *
@@ -72,11 +137,10 @@ function calculateRouteFromAtoB(platform) {
       routeRequestParams = {
         routingMode: 'fast',
         transportMode: 'car',
-        origin: '-27.57383,-60.71526',
-        // via: '-27.21438,-61.18795',
-        destination: '-27.46056,-58.98389',
-        // return: 'polyline,turnByTurnActions,actions,instructions,travelSummary',
-        return: 'polyline,travelSummary',
+        origin: origen,
+        destination: destino,
+        return: 'polyline,turnByTurnActions,actions,instructions,travelSummary',
+        
       };
 
   router.calculateRoute(
@@ -86,6 +150,65 @@ function calculateRouteFromAtoB(platform) {
   );
 }
 
+let inputStart = document.getElementById('start');
+let inputEnd = document.getElementById('end');
+
+function searchAddress() {
+  document.getElementsByClassName("loader")[0].style.display = "block";
+  if (inputStart.value) {
+    setTimeout(() => {
+      geocodeStart(platform, inputStart.value)
+    }, 1000);
+   
+  }
+  if (inputEnd.value) {
+    setTimeout(() => {
+      geocodeEnd(platform, inputEnd.value)
+    }, 2000);
+  }
+}
+
+function geocodeStart(platform, start) {
+    var geocoder = platform.getSearchService(),
+        geocodingParameters = {
+          q: start
+        };
+
+    geocoder.geocode(
+      geocodingParameters,
+      onSuccessStart,
+      onError
+    );
+  }
+
+function geocodeEnd(platform, end) {
+    var geocoder = platform.getSearchService(),
+        geocodingParameters = {
+          q: end
+        };
+
+    geocoder.geocode(
+      geocodingParameters,
+      onSuccessEnd,
+      onError
+    );
+  }
+
+function onSuccessStart(result) {
+  if (result.items.length > 0) {
+    let resultado = result.items[0].position;
+    origen = resultado.lat+','+resultado.lng
+  }
+}
+
+function onSuccessEnd(result) {
+  if (result.items.length > 0) {
+    let res = result.items[0].position;
+    destino = res.lat+','+res.lng
+    calculateRouteFromAtoB(platform);
+  }
+}
+
 /**
  * This function will be called once the Routing REST API provides a response
  * @param {Object} result A JSONP object representing the calculated route
@@ -93,20 +216,23 @@ function calculateRouteFromAtoB(platform) {
  * see: http://developer.here.com/rest-apis/documentation/routing/topics/resource-type-calculate-route.html
  */
 function onSuccess(result) {
-    // console.log(result.routes);
-  var route = result.routes[0];
+  if (result.hasOwnProperty('routes')) {
+    
+      var route = result.routes[0];
 
-  /*
-   * The styling of the route response on the map is entirely under the developer's control.
-   * A representative styling can be found the full JS + HTML code of this example
-   * in the functions below:
-   */
-  addRouteShapeToMap(route);
-  addManueversToMap(route);
-//   addWaypointsToPanel(route);
-//   addManueversToPanel(route);
-  addSummaryToPanel(route);
-  // ... etc.
+      /*
+      * The styling of the route response on the map is entirely under the developer's control.
+      * A representative styling can be found the full JS + HTML code of this example
+      * in the functions below:
+      */
+      addRouteShapeToMap(route);
+      addManueversToMap(route);
+      addWaypointsToPanel(route);
+      addManueversToPanel(route);
+      addSummaryToPanel(route);
+      // ... etc.
+  }
+  document.getElementsByClassName("loader")[0].style.display = "none";
 }
 
 /**
@@ -114,6 +240,7 @@ function onSuccess(result) {
  * @param {Object} error The error message received.
  */
 function onError(error) {
+  document.getElementsByClassName("loader")[0].style.display = "none";
   alert('Can\'t reach the remote server');
 }
 
@@ -136,8 +263,8 @@ var defaultLayers = platform.createDefaultLayers();
 // Step 2: initialize a map - this map is centered over Berlin
 var map = new H.Map(mapContainer,
   defaultLayers.vector.normal.map, {
-  center: {lat: -27.57383, lng: -60.71526},
-  zoom: 13,
+  center: {lat: 19.43195, lng: -99.13315},
+  zoom: 10,
   pixelRatio: window.devicePixelRatio || 1
 });
 
@@ -179,25 +306,30 @@ function openBubble(position, text) {
  * @param {Object} route A route as received from the H.service.RoutingService
  */
 function addRouteShapeToMap(route) {
-  route.sections.forEach((section) => {
-    // decode LineString from the flexible polyline
-    let linestring = H.geo.LineString.fromFlexiblePolyline(section.polyline);
+  if (route.sections) {
 
-    // Create a polyline to display the route:
-    let polyline = new H.map.Polyline(linestring, {
-      style: {
-        lineWidth: 4,
-        strokeColor: 'rgba(0, 128, 255, 0.7)'
-      }
-    });
+    map.removeObjects(map.getObjects ());
 
-    // Add the polyline to the map
-    map.addObject(polyline);
-    // And zoom to its bounding rectangle
-    map.getViewModel().setLookAtData({
-      bounds: polyline.getBoundingBox()
+    route.sections.forEach((section) => {
+      // decode LineString from the flexible polyline
+      let linestring = H.geo.LineString.fromFlexiblePolyline(section.polyline);
+
+      // Create a polyline to display the route:
+      let polyline = new H.map.Polyline(linestring, {
+        style: {
+          lineWidth: 4,
+          strokeColor: 'rgba(0, 128, 255, 0.7)'
+        }
+      });
+
+      // Add the polyline to the map
+      map.addObject(polyline);
+      // And zoom to its bounding rectangle
+      map.getViewModel().setLookAtData({
+        bounds: polyline.getBoundingBox()
+      });
     });
-  });
+  }
 }
 
 /**
@@ -205,37 +337,84 @@ function addRouteShapeToMap(route) {
  * @param {Object} route A route as received from the H.service.RoutingService
  */
 function addManueversToMap(route) {
+  total = 0;
   
   route.sections.forEach((section) => {
     let poly = H.geo.LineString.fromFlexiblePolyline(section.polyline).getLatLngAltArray();
 
+    console.log(poly);
+    console.log(casetas);
 
-    let lat = -27.180250000000022;
-    let long = -59.33659000000001;
+    // Match coordenadas casetas con coordenadas poligono
+    const intersection = casetas.filter(element => poly.includes(element.lat) || poly.includes(element.lng));
 
-    if (poly.indexOf(lat) >= 0 & poly.indexOf(long) >= 0) {
-        var svgCustom = `<svg xmlns="http://www.w3.org/2000/svg" style="color: red;" width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-</svg>`,
-        dotIconCustom = new H.map.Icon(svgCustom, {anchor: {x:8, y:8}}),
-        group = new H.map.Group(),
-        i,
-        j;
+    if (intersection.length > 0) {
 
-        var marker = new H.map.Marker({
-            lat: lat,
-            lng: long},
-            {icon: dotIconCustom});
-        marker.instruction = 'Peaje Makalle Precio $100';
-        group.addObject(marker);
+      intersection.forEach((element) => {
 
-        group.addEventListener('tap', function (evt) {
+
+      var svgCustom = `<svg xmlns="http://www.w3.org/2000/svg" style="color: red;" width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+    </svg>`,
+            dotIconCustom = new H.map.Icon(svgCustom, {anchor: {x:8, y:8}}),
+            group = new H.map.Group(),
+            i,
+            j;
+
+            // Add custom marker
+            var marker = new H.map.Marker({
+                lat: element.lat,
+                lng: element.lng
+              },
+                {icon: dotIconCustom});
+            marker.instruction = element.name + ' ' + 'Precio $' + element.price;
+            group.addObject(marker);
+
+            group.addEventListener('tap', function (evt) {
+          map.setCenter(evt.target.getGeometry());
+          openBubble(evt.target.getGeometry(), evt.target.instruction);
+        }, false);
+
+        map.addObject(group);
+
+        total += element.price;
+      });
+    }
+
+    var svgMarkup = '<svg width="18" height="18" ' +
+    'xmlns="http://www.w3.org/2000/svg">' +
+    '<circle cx="8" cy="8" r="8" ' +
+      'fill="#1b468d" stroke="white" stroke-width="1" />' +
+    '</svg>',
+    dotIcon = new H.map.Icon(svgMarkup, {anchor: {x:8, y:8}}),
+    group = new H.map.Group(),
+    i,
+    j;
+
+  route.sections.forEach((section) => {
+    let poly = H.geo.LineString.fromFlexiblePolyline(section.polyline).getLatLngAltArray();
+
+    let actions = section.actions;
+    // Add a marker for each maneuver
+    for (i = 0; i < actions.length; i += 1) {
+      let action = actions[i];
+      var marker = new H.map.Marker({
+        lat: poly[action.offset * 3],
+        lng: poly[action.offset * 3 + 1]},
+        {icon: dotIcon});
+      marker.instruction = action.instruction;
+      group.addObject(marker);
+    }
+
+    group.addEventListener('tap', function (evt) {
       map.setCenter(evt.target.getGeometry());
       openBubble(evt.target.getGeometry(), evt.target.instruction);
     }, false);
 
+    // Add the maneuvers group to the map
     map.addObject(group);
-    }
+  });
+    
   });
 }
 
@@ -274,7 +453,8 @@ function addSummaryToPanel(route) {
 
   var summaryDiv = document.createElement('div'),
     content = '<b>Total distance</b>: ' + distance + 'm. <br />' +
-      '<b>Travel Time</b>: ' + toMMSS(duration) + ' (in current traffic)';
+      '<b>Travel Time</b>: ' + toMMSS(duration) + ' (in current traffic) <br />' +
+      '<b>Total price</b>: $' + total + ' <br />';
 
   summaryDiv.style.fontSize = 'small';
   summaryDiv.style.marginLeft = '5%';
@@ -316,7 +496,28 @@ function addManueversToPanel(route) {
 function toMMSS(duration) {
   return Math.floor(duration / 60) + ' minutes ' + (duration % 60) + ' seconds.';
 }
-
-// Now use the map as required...
-calculateRouteFromAtoB(platform);
 </script>
+
+<style>
+  .loader {
+    border: 8px solid #f3f3f3;
+    /* Light grey */
+    border-top: 8px solid #3498db;
+    /* Blue */
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 2s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
