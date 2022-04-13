@@ -139,8 +139,8 @@ function calculateRouteFromAtoB(platform) {
         transportMode: 'car',
         origin: origen,
         destination: destino,
-        return: 'polyline,turnByTurnActions,actions,instructions,travelSummary',
-        
+        return: 'polyline,turnByTurnActions,actions,instructions,travelSummary,turnbyturnactions',
+        lang: 'es'
       };
 
   router.calculateRoute(
@@ -219,8 +219,9 @@ function onSuccessEnd(result) {
  */
 function onSuccess(result) {
   if (result.hasOwnProperty('routes')) {
-    
+
       var route = result.routes[0];
+      console.log(route);
 
       /*
       * The styling of the route response on the map is entirely under the developer's control.
@@ -260,7 +261,9 @@ var platform = new H.service.Platform({
   apikey: '{{ config('services.here.api_key') }}'
 });
 
-var defaultLayers = platform.createDefaultLayers();
+var defaultLayers = platform.createDefaultLayers({
+  lg: 'es'
+});
 
 // Step 2: initialize a map - this map is centered over Berlin
 var map = new H.Map(mapContainer,
@@ -279,7 +282,7 @@ window.addEventListener('resize', () => map.getViewPort().resize());
 var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
 
 // Create the default UI components
-var ui = H.ui.UI.createDefault(map, defaultLayers);
+var ui = H.ui.UI.createDefault(map, defaultLayers, 'es-ES');
 
 // Hold a reference to any infobubble opened
 var bubble;
@@ -346,6 +349,8 @@ function addManueversToMap(route) {
 
     console.log(poly);
     console.log(casetas);
+
+    let auxPoly = poly;
 
     // Match coordenadas casetas con coordenadas poligono
     const intersection = casetas.filter(element => poly.includes(element.lat) || poly.includes(element.lng));
