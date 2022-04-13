@@ -55,6 +55,10 @@
     <input type="search" name="" id="start" value="Villa Angela">
     <label for="end">Destino</label>
     <input type="search" name="" id="end" value="Resistencia">
+    <label for="mode">Camino Rápido</label>
+    <input type="radio" name="mode" id="fast" checked>
+    <label for="mode">Camino Corto</label>
+    <input type="radio" name="mode" id="short">
     <button onclick="searchAddress()">ir</button>
     <div class="loader"></div>
   </div>
@@ -67,7 +71,6 @@
 </html>
 
 <script>
-
   function testing() {
     axios.get('/api/near')
     .then((res)=>{
@@ -95,31 +98,24 @@
         },
         {
             id: 3,
-            name: "Caseta 3",
-            lat: 19.508876,
-            lng: -99.236592,
+            name: "Caseta Autopista México-Querétaro",
+            lat: 19.66073,
+            lng: -99.19839,
             price: 75.00
         },
         {
             id: 4,
-            name: "Caseta 4",
-            lat: 19.47013,
-            lng: -99.22682,
-            price: 75.00
+            name: "Caseta Autopista Cuajimalpa-Naucalpan",
+            lat: 19.5282,
+            lng: -99.28149,
+            price: 65.00
         },
         {
             id: 5,
-            name: "Peaje",
-            lat: -27.1867896,
-            lng: -59.3264541,
-            price: 99.00
-        },
-        {
-            id: 6,
-            name: "Caseta 6",
-            lat: -27.18025,
-            lng: -59.33659,
-            price: 55.00
+            name: "Caseta Viaducto Bicentenario",
+            lat: 19.4693, 
+            lng: -99.22635,
+            price: 19.00
         },
     ]
   
@@ -133,13 +129,15 @@
  * @param {H.service.Platform} platform A stub class to access HERE services
  */
 function calculateRouteFromAtoB(platform) {
+  let mode = document.getElementById("fast").checked ? 'fast' : 'short';
+
   var router = platform.getRoutingService(null, 8),
       routeRequestParams = {
-        routingMode: 'fast',
+        routingMode: mode,
         transportMode: 'car',
         origin: origen,
         destination: destino,
-        return: 'polyline,turnByTurnActions,actions,instructions,travelSummary,turnbyturnactions',
+        return: 'polyline,turnByTurnActions,actions,instructions,travelSummary',
         lang: 'es'
       };
 
@@ -198,14 +196,16 @@ function geocodeEnd(platform, end) {
 
 function onSuccessStart(result) {
   if (result.items.length > 0) {
-    let resultado = result.items[0].position;
+    let resultado = null;
+    resultado = result.items[0].position;
     origen = resultado.lat+','+resultado.lng
   }
 }
 
 function onSuccessEnd(result) {
   if (result.items.length > 0) {
-    let res = result.items[0].position;
+    let res = null;
+    res = result.items[0].position;
     destino = res.lat+','+res.lng
     calculateRouteFromAtoB(platform);
   }
@@ -221,7 +221,6 @@ function onSuccess(result) {
   if (result.hasOwnProperty('routes')) {
 
       var route = result.routes[0];
-      console.log(route);
 
       /*
       * The styling of the route response on the map is entirely under the developer's control.
@@ -341,86 +340,93 @@ function addRouteShapeToMap(route) {
  * Creates a series of H.map.Marker points from the route and adds them to the map.
  * @param {Object} route A route as received from the H.service.RoutingService
  */
-function addManueversToMap(route) {
+function addManueversToMap(route) {  
   total = 0;
-  
   route.sections.forEach((section) => {
     let poly = H.geo.LineString.fromFlexiblePolyline(section.polyline).getLatLngAltArray();
+    let intersection = [];
 
-    console.log(poly);
-    console.log(casetas);
+    // Match coordenadas casetas con coordenadas ruta
+    for (let i = 0; i < poly.length; i = i+3) {
+      casetas.map(function(caseta) {
+        let point1 = new H.geo.Point(poly[i], poly[i + 1]),
+        point2 = new H.geo.Point(caseta.lat, caseta.lng);
 
-    let auxPoly = poly;
+        distance = point1.distance(point2);
+        if (distance <= 100) {
+          intersection.push(caseta)
+        }
+      })
+      
+    }
 
-    // Match coordenadas casetas con coordenadas poligono
-    const intersection = casetas.filter(element => poly.includes(element.lat) || poly.includes(element.lng));
+    uniqueArray = intersection.filter(function(item, pos, self) {
+        return self.indexOf(item) == pos;
+    })
 
-    if (intersection.length > 0) {
+    if (uniqueArray.length > 0) {
+      uniqueArray.forEach((element) => {
+        var svgCustom = `<svg xmlns="http://www.w3.org/2000/svg" style="color: red;" width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+          </svg>`,
+              dotIconCustom = new H.map.Icon(svgCustom, {anchor: {x:8, y:8}}),
+              group = new H.map.Group(),
+              i,
+              j;
 
-      intersection.forEach((element) => {
+              // Add custom marker
+              var marker = new H.map.Marker({
+                  lat: element.lat,
+                  lng: element.lng
+                },
+                  {icon: dotIconCustom});
+              marker.instruction = element.name + ' ' + 'Precio $' + element.price;
+              group.addObject(marker);
 
+              group.addEventListener('tap', function (evt) {
+            map.setCenter(evt.target.getGeometry());
+            openBubble(evt.target.getGeometry(), evt.target.instruction);
+          }, false);
 
-      var svgCustom = `<svg xmlns="http://www.w3.org/2000/svg" style="color: red;" width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-    </svg>`,
-            dotIconCustom = new H.map.Icon(svgCustom, {anchor: {x:8, y:8}}),
-            group = new H.map.Group(),
-            i,
-            j;
+          map.addObject(group);
 
-            // Add custom marker
-            var marker = new H.map.Marker({
-                lat: element.lat,
-                lng: element.lng
-              },
-                {icon: dotIconCustom});
-            marker.instruction = element.name + ' ' + 'Precio $' + element.price;
-            group.addObject(marker);
-
-            group.addEventListener('tap', function (evt) {
-          map.setCenter(evt.target.getGeometry());
-          openBubble(evt.target.getGeometry(), evt.target.instruction);
-        }, false);
-
-        map.addObject(group);
-
-        total += element.price;
+          total += element.price;
       });
     }
 
     var svgMarkup = '<svg width="18" height="18" ' +
-    'xmlns="http://www.w3.org/2000/svg">' +
-    '<circle cx="8" cy="8" r="8" ' +
-      'fill="#1b468d" stroke="white" stroke-width="1" />' +
-    '</svg>',
+        'xmlns="http://www.w3.org/2000/svg">' +
+        '<circle cx="8" cy="8" r="8" ' +
+          'fill="#1b468d" stroke="white" stroke-width="1" />' +
+        '</svg>',
     dotIcon = new H.map.Icon(svgMarkup, {anchor: {x:8, y:8}}),
     group = new H.map.Group(),
     i,
     j;
 
-  route.sections.forEach((section) => {
-    let poly = H.geo.LineString.fromFlexiblePolyline(section.polyline).getLatLngAltArray();
+    route.sections.forEach((section) => {
+        let poly = H.geo.LineString.fromFlexiblePolyline(section.polyline).getLatLngAltArray();
 
-    let actions = section.actions;
-    // Add a marker for each maneuver
-    for (i = 0; i < actions.length; i += 1) {
-      let action = actions[i];
-      var marker = new H.map.Marker({
-        lat: poly[action.offset * 3],
-        lng: poly[action.offset * 3 + 1]},
-        {icon: dotIcon});
-      marker.instruction = action.instruction;
-      group.addObject(marker);
-    }
+        let actions = section.actions;
+        // Add a marker for each maneuver
+        for (i = 0; i < actions.length; i += 1) {
+          let action = actions[i];
+          var marker = new H.map.Marker({
+            lat: poly[action.offset * 3],
+            lng: poly[action.offset * 3 + 1]},
+            {icon: dotIcon});
+          marker.instruction = action.instruction;
+          group.addObject(marker);
+        }
 
-    group.addEventListener('tap', function (evt) {
-      map.setCenter(evt.target.getGeometry());
-      openBubble(evt.target.getGeometry(), evt.target.instruction);
-    }, false);
+        group.addEventListener('tap', function (evt) {
+          map.setCenter(evt.target.getGeometry());
+          openBubble(evt.target.getGeometry(), evt.target.instruction);
+        }, false);
 
-    // Add the maneuvers group to the map
-    map.addObject(group);
-  });
+        // Add the maneuvers group to the map
+        map.addObject(group);
+      });
     
   });
 }
@@ -459,9 +465,9 @@ function addSummaryToPanel(route) {
   });
 
   var summaryDiv = document.createElement('div'),
-    content = '<b>Total distance</b>: ' + distance + 'm. <br />' +
-      '<b>Travel Time</b>: ' + toMMSS(duration) + ' (in current traffic) <br />' +
-      '<b>Total price</b>: $' + total + ' <br />'; // Total casetas
+    content = '<b>Distancia total</b>: ' + distance + 'm. <br />' +
+      '<b>Tiempo de viaje</b>: ' + toMMSS(duration) + ' (in current traffic) <br />' +
+      '<b>Precio total</b>: $' + total + ' <br />'; // Total casetas
 
   summaryDiv.style.fontSize = 'small';
   summaryDiv.style.marginLeft = '5%';
