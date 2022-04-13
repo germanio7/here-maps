@@ -50,7 +50,7 @@
 
 <body id="markers-on-the-map">
 
-  <div>
+  <div style="display: flex;">
     <label for="start">Inicio</label>
     <input type="search" name="" id="start" value="Villa Angela">
     <label for="end">Destino</label>
@@ -168,6 +168,7 @@ function searchAddress() {
   }
 }
 
+// Search geocoding input Inicio
 function geocodeStart(platform, start) {
     var geocoder = platform.getSearchService(),
         geocodingParameters = {
@@ -181,6 +182,7 @@ function geocodeStart(platform, start) {
     );
   }
 
+// Search geocoding input End
 function geocodeEnd(platform, end) {
     var geocoder = platform.getSearchService(),
         geocodingParameters = {
@@ -454,7 +456,7 @@ function addSummaryToPanel(route) {
   var summaryDiv = document.createElement('div'),
     content = '<b>Total distance</b>: ' + distance + 'm. <br />' +
       '<b>Travel Time</b>: ' + toMMSS(duration) + ' (in current traffic) <br />' +
-      '<b>Total price</b>: $' + total + ' <br />';
+      '<b>Total price</b>: $' + total + ' <br />'; // Total casetas
 
   summaryDiv.style.fontSize = 'small';
   summaryDiv.style.marginLeft = '5%';
