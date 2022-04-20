@@ -187,7 +187,7 @@ function onSuccessEnd(result) {
  * see: http://developer.here.com/rest-apis/documentation/routing/topics/resource-type-calculate-route.html
  */
 function onSuccess(result) {
-  if (result.hasOwnProperty('routes')) {
+  if (result.hasOwnProperty('routes') && result.routes.length > 0) {
 
       var route = result.routes[0];
 
@@ -202,6 +202,8 @@ function onSuccess(result) {
       addManueversToPanel(route);
       addSummaryToPanel(route);
       // ... etc.
+  } else {
+    alert('Ruta no encontrada.')
   }
   document.getElementsByClassName("loader")[0].style.display = "none";
 }
