@@ -52,9 +52,9 @@
 
   <div style="display: flex;">
     <label for="start">Inicio</label>
-    <input type="search" name="" id="start" value="Villa Angela">
+    <input type="search" name="" id="start" value="Bosque de las Lomas, Ciudad de México">
     <label for="end">Destino</label>
-    <input type="search" name="" id="end" value="Resistencia">
+    <input type="search" name="" id="end" value="Tepotzotlán, México">
     <label for="mode">Camino Rápido</label>
     <input type="radio" name="mode" id="fast" checked>
     <label for="mode">Camino Corto</label>
@@ -62,6 +62,11 @@
     <button onclick="searchAddress()">ir</button>
     <div class="loader"></div>
   </div>
+
+  @php
+      $casetas = file_get_contents(base_path('easytrip.json'));
+  @endphp
+
   <div id="map" style="width: 88rem; height: 40rem;"></div>
   <div id="panel"></div>
 
@@ -81,43 +86,7 @@
   var origen = '';
   var destino = '';
   var total = 0;
-  const casetas = [
-        {
-            id: 1,
-            name: "Caseta 1",
-            lat: -27.180250000000,
-            lng: -59.336590000000,
-            price: 100.00
-        },
-        {
-            id: 2,
-            name: "Caseta 2",
-            lat: -26.87504,
-            lng: -60.241589999999,
-            price: 190.00
-        },
-        {
-            id: 3,
-            name: "Caseta Autopista México-Querétaro",
-            lat: 19.66073,
-            lng: -99.19839,
-            price: 75.00
-        },
-        {
-            id: 4,
-            name: "Caseta Autopista Cuajimalpa-Naucalpan",
-            lat: 19.5282,
-            lng: -99.28149,
-            price: 65.00
-        },
-        {
-            id: 5,
-            name: "Caseta Viaducto Bicentenario",
-            lat: 19.4693, 
-            lng: -99.22635,
-            price: 19.00
-        },
-    ]
+  const casetas = JSON.parse(@json($casetas))
   
   /**
  * Calculates and displays a car route from the Brandenburg Gate in the centre of Berlin
@@ -350,10 +319,10 @@ function addManueversToMap(route) {
     for (let i = 0; i < poly.length; i = i+3) {
       casetas.map(function(caseta) {
         let point1 = new H.geo.Point(poly[i], poly[i + 1]),
-        point2 = new H.geo.Point(caseta.lat, caseta.lng);
+        point2 = new H.geo.Point(caseta.Latitud, caseta.Longitud);
 
         distance = point1.distance(point2);
-        if (distance <= 100) {
+        if (distance <= 50) {
           intersection.push(caseta)
         }
       })
@@ -376,11 +345,11 @@ function addManueversToMap(route) {
 
               // Add custom marker
               var marker = new H.map.Marker({
-                  lat: element.lat,
-                  lng: element.lng
+                  lat: element.Latitud,
+                  lng: element.Longitud
                 },
                   {icon: dotIconCustom});
-              marker.instruction = element.name + ' ' + 'Precio $' + element.price;
+              marker.instruction = element.Name;
               group.addObject(marker);
 
               group.addEventListener('tap', function (evt) {
