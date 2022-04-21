@@ -31,7 +31,13 @@ return [
     ],
 
     'here' => [
-        'api_key' => env('API_KEY_HERE')
+        'api_key' => env('API_KEY_HERE'),
+        'routing' => [
+            'base_url' => env('BASE_URL_HERE_ROUTING')
+        ],
+        'search'  => [
+            'base_url' => env('BASE_URL_HERE_SEARCH')
+        ]
     ],
 
 ];
