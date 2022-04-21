@@ -49,28 +49,39 @@
 </head>
 
 <body id="markers-on-the-map">
+    <div style="contain: content">
+        <div style="display: flex;">
+            <div style="display: flex-1;">
+                <label for="start">Inicio</label>
+                <input onkeyup="buscar(value, 'listStart')" type="search" name="" id="start" value="">
+                <ul style="cursor: pointer;" id="listStart"></ul>
+            </div>
+            <div style="display: flex-1;">
+                <label for="end">Destino</label>
+                <input onkeyup="buscar(value, 'listEnd')" type="search" name="" id="end" value="">
+                <ul id="listEnd" style="cursor: pointer;"></ul>
+            </div>
+            <label for="mode">Camino Rápido</label>
+            <input type="radio" name="mode" id="fast" checked>
+            <label for="mode">Camino Corto</label>
+            <input type="radio" name="mode" id="short">
+            
+        </div>
 
-    <div style="display: flex;">
-        <label for="start">Inicio</label>
-        <input type="search" name="" id="start" value="Bosque de las Lomas, Ciudad de México">
-        <label for="end">Destino</label>
-        <input type="search" name="" id="end" value="Tepotzotlán, México">
-        <label for="mode">Camino Rápido</label>
-        <input type="radio" name="mode" id="fast" checked>
-        <label for="mode">Camino Corto</label>
-        <input type="radio" name="mode" id="short">
-        <button onclick="searchAddress()">ir</button>
-        <div class="loader"></div>
+        <div style="display: flex;">
+            <button disabled id="searching" onclick="searchRoute()">Buscar ruta</button>
+            <div class="loader"></div>
+        </div>
+
+        @php
+        $casetas = file_get_contents(base_path('easytrip.json'));
+        @endphp
+
+        <div id="map" style="width: 88rem; height: 40rem;"></div>
+        <div id="panel"></div>
+
+        <script type="text/javascript" src='demo.js'></script>
     </div>
-
-    @php
-    $casetas = file_get_contents(base_path('easytrip.json'));
-    @endphp
-
-    <div id="map" style="width: 88rem; height: 40rem;"></div>
-    <div id="panel"></div>
-
-    <script type="text/javascript" src='demo.js'></script>
 </body>
 
 </html>
@@ -106,20 +117,13 @@ function alternativeCalculate() {
     });
 }
 
-async function searchAddress() {
+async function buscar(value, lista){
+    const results = await searchPlace(value);
+    addOptions(results.items, lista)
+}
+
+async function searchRoute() {
     document.getElementsByClassName("loader")[0].style.display = "block";
-
-    if (inputStart.value) {
-        origen = null;
-        const result1 = await searchPlace(inputStart.value);
-        origen = result1.items[0].position.lat+','+result1.items[0].position.lng;
-    }
-    if (inputEnd.value) {
-        destino = null;
-        const result2 = await searchPlace(inputEnd.value);
-        destino = result2.items[0].position.lat+','+result2.items[0].position.lng;
-    }
-
     if (origen && destino) {
         const result = await alternativeCalculate();
         let route = result.routes[0];
@@ -136,9 +140,33 @@ async function searchAddress() {
     document.getElementsByClassName("loader")[0].style.display = "none";
 }
 
+function addOptions(params, lista){
+    let list = document.getElementById(lista);
+    list.innerHTML = "";
+
+    params.forEach((element) => {
+        var li = document.createElement("li");
+        li.appendChild(document.createTextNode(element.title));
+        li.onclick = function () {
+            if (lista == 'listStart') {
+                origen = element.position.lat+','+element.position.lng;
+            }
+            if (lista == 'listEnd') {
+                destino = element.position.lat+','+element.position.lng;
+            }
+            document.getElementById(lista).innerHTML = "";
+            if (origen && destino) {
+                document.getElementById('searching').disabled = false;
+            }
+        };
+        list.appendChild(li);
+    })
+}
+
 function searchPlace(place){
     return new Promise((resolve) => {
-        axios
+        setTimeout(() => {
+            axios
             .get('/api/search-place', { params: {q:  place} })
             .then((response) => {
                 resolve(response.data)
@@ -146,6 +174,8 @@ function searchPlace(place){
             .catch((error) => {
                 alert(error.data)
             });
+        }, 1500);
+        
     });
 }
 
