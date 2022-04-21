@@ -78,14 +78,15 @@
 <script>
     let inputStart = document.getElementById('start');
     let inputEnd = document.getElementById('end');
-    let mode = document.getElementById("fast").checked ? 'fast' : 'short';
     let loading = document.getElementsByClassName("loader")[0].style.display
     let origen = '';
-    var destino = '';
+    let destino = '';
     var total = 0;
     const casetas = JSON.parse(@json($casetas))
 
 function alternativeCalculate() {
+    let mode = document.getElementById("fast").checked ? 'fast' : 'short';
+
     return new Promise((resolve) => {
         axios
             .get('/api/calculate-route', {params: {
