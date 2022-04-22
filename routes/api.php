@@ -44,5 +44,34 @@ Route::get('calculate-route', function (Request $request) {
 
     return $results = $client->json();
 
-    // return FlexiblePolyline::decode($results['routes'][0]['sections'][0]['polyline']);
+    $easytrip = json_decode(file_get_contents(base_path('easytrip.json')));
+    $casetas = collect();
+
+    foreach ($easytrip as $key => $value) {
+        $casetas->push([
+            'lat' => $value->Latitud,
+            'lng' => $value->Longitud
+        ]);
+    }
+
+    $decode = FlexiblePolyline::decode($results['routes'][0]['sections'][0]['polyline']);
+
+    $decode = $decode['polyline'];
+    $polyline = collect();
+
+    foreach ($decode as $key => $value) {
+        $polyline->push([
+            'lat' => $value[0],
+            'lng' => $value[1]
+        ]);
+    }
+
+    $matrix = Http::post('https://matrix.router.hereapi.com/v8/matrix', [
+        'apiKey'            => config('services.here.api_key'),
+        'origins'           => $polyline,
+        'destinations'      => $casetas,
+        'regionDefinition'  => 'type:world',
+    ]);
+
+    return $matrix->json();
 });
