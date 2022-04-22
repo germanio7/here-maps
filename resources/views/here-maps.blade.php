@@ -2,98 +2,98 @@
 <html>
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-    <title>Easytrip</title>
-    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
-    <link rel="stylesheet" type="text/css" href="demo.css" />
-    <link rel="stylesheet" type="text/css" href="styles.css" />
-    <link rel="stylesheet" type="text/css" href="../template.css" />
-    <script type="text/javascript" src='../test-credentials.js'></script>
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
-    <script src="{{ mix('js/app.js') }}" defer></script>
-    <style type="text/css">
-        .directions li span.arrow {
-            display: inline-block;
-            min-width: 28px;
-            min-height: 28px;
-            background-position: 0px;
-            background-image: url("https://heremaps.github.io/maps-api-for-javascript-examples/map-with-route-from-a-to-b/img/arrows.png");
-            position: relative;
-            top: 8px;
-        }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <title>Easytrip</title>
+  <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+  <link rel="stylesheet" type="text/css" href="demo.css" />
+  <link rel="stylesheet" type="text/css" href="styles.css" />
+  <link rel="stylesheet" type="text/css" href="../template.css" />
+  <script type="text/javascript" src='../test-credentials.js'></script>
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+  <script src="{{ mix('js/app.js') }}" defer></script>
+  <style type="text/css">
+    .directions li span.arrow {
+      display: inline-block;
+      min-width: 28px;
+      min-height: 28px;
+      background-position: 0px;
+      background-image: url("https://heremaps.github.io/maps-api-for-javascript-examples/map-with-route-from-a-to-b/img/arrows.png");
+      position: relative;
+      top: 8px;
+    }
 
-        .directions li span.depart {
-            background-position: -28px;
-        }
+    .directions li span.depart {
+      background-position: -28px;
+    }
 
-        .directions li span.rightturn {
-            background-position: -224px;
-        }
+    .directions li span.rightturn {
+      background-position: -224px;
+    }
 
-        .directions li span.leftturn {
-            background-position: -252px;
-        }
+    .directions li span.leftturn {
+      background-position: -252px;
+    }
 
-        .directions li span.arrive {
-            background-position: -1288px;
-        }
-    </style>
-    <script>
-        window.ENV_VARIABLE = 'developer.here.com'
-    </script>
-    <script src='../iframeheight.js'></script>
+    .directions li span.arrive {
+      background-position: -1288px;
+    }
+  </style>
+  <script>
+    window.ENV_VARIABLE = 'developer.here.com'
+  </script>
+  <script src='../iframeheight.js'></script>
 </head>
 
 <body id="markers-on-the-map">
-    <div style="contain: content">
-        <div style="display: flex;">
-            <div style="display: flex-1;">
-                <label for="start">Inicio</label>
-                <input onkeyup="buscar(value, 'listStart')" type="search" name="" id="start" value="">
-                <ul style="cursor: pointer;" id="listStart"></ul>
-            </div>
-            <div style="display: flex-1;">
-                <label for="end">Destino</label>
-                <input onkeyup="buscar(value, 'listEnd')" type="search" name="" id="end" value="">
-                <ul id="listEnd" style="cursor: pointer;"></ul>
-            </div>
-            <label for="mode">Camino Rápido</label>
-            <input type="radio" name="mode" id="fast" checked>
-            <label for="mode">Camino Corto</label>
-            <input type="radio" name="mode" id="short">
-            
-        </div>
+  <div style="contain: content">
+    <div style="display: flex;">
+      <div style="display: flex-1;">
+        <label for="start">Inicio</label>
+        <input onkeyup="buscar(value, 'listStart'); loadingDisplay()" type="search" name="" id="start" value="">
+        <ul style="cursor: pointer;" id="listStart"></ul>
+      </div>
+      <div style="display: flex-1;">
+        <label for="end">Destino</label>
+        <input onkeyup="buscar(value, 'listEnd'); loadingDisplay()" type="search" name="" id="end" value="">
+        <ul id="listEnd" style="cursor: pointer;"></ul>
+      </div>
+      <label for="mode">Camino Rápido</label>
+      <input type="radio" name="mode" id="fast" checked>
+      <label for="mode">Camino Corto</label>
+      <input type="radio" name="mode" id="short">
 
-        <div style="display: flex;">
-            <button disabled id="searching" onclick="searchRoute()">Buscar ruta</button>
-            <div class="loader"></div>
-        </div>
-
-        @php
-        $casetas = file_get_contents(base_path('easytrip.json'));
-        @endphp
-
-        <div id="map" style="width: 88rem; height: 40rem;"></div>
-        <div id="panel"></div>
-
-        <script type="text/javascript" src='demo.js'></script>
     </div>
+
+    <div style="display: flex;">
+      <button disabled id="searching" onclick="searchRoute()">Buscar ruta</button>
+      <div class="loader"></div>
+    </div>
+
+    @php
+    $casetas = file_get_contents(base_path('easytrip.json'));
+    @endphp
+
+    <div id="map" style="width: 88rem; height: 40rem;"></div>
+    <div id="panel"></div>
+
+    <script type="text/javascript" src='demo.js'></script>
+  </div>
 </body>
 
 </html>
 
 <script>
-    let inputStart = document.getElementById('start');
-    let inputEnd = document.getElementById('end');
-    let loading = document.getElementsByClassName("loader")[0].style.display
-    let origen = '';
-    let destino = '';
-    var total = 0;
-    const casetas = JSON.parse(@json($casetas))
+  let inputStart = document.getElementById('start');
+  let inputEnd = document.getElementById('end');
+  let origin = '19.43195,-99.13315';
+  let coordinates = origin.split(",")
+  let destination = '';
+  var total = 0;
+  const casetas = JSON.parse(@json($casetas))
 
 function alternativeCalculate() {
     let mode = document.getElementById("fast").checked ? 'fast' : 'short';
@@ -103,8 +103,8 @@ function alternativeCalculate() {
             .get('/api/calculate-route', {params: {
             routingMode: mode,
             transportMode: 'car',
-            origin: origen,
-            destination: destino,
+            origin: origin,
+            destination: destination,
             return: 'polyline,turnByTurnActions,actions,instructions,travelSummary',
             lang: 'es'
         }})
@@ -117,14 +117,23 @@ function alternativeCalculate() {
     });
 }
 
+function loadingDisplay(){
+  document.getElementsByClassName("loader")[0].style.display = "block";
+}
+
+function loadingHidden(){
+  document.getElementsByClassName("loader")[0].style.display = "none";
+}
+
 async function buscar(value, lista){
     const results = await searchPlace(value);
     addOptions(results.items, lista)
+    loadingHidden()
 }
 
 async function searchRoute() {
-    document.getElementsByClassName("loader")[0].style.display = "block";
-    if (origen && destino) {
+  loadingDisplay()
+    if (origin && destination) {
         const result = await alternativeCalculate();
         let route = result.routes[0];
         if (route) {
@@ -137,7 +146,7 @@ async function searchRoute() {
             alert('Ruta no encontrada.');
         }
     }
-    document.getElementsByClassName("loader")[0].style.display = "none";
+   loadingHidden()
 }
 
 function addOptions(params, lista){
@@ -149,13 +158,16 @@ function addOptions(params, lista){
         li.appendChild(document.createTextNode(element.title));
         li.onclick = function () {
             if (lista == 'listStart') {
-                origen = element.position.lat+','+element.position.lng;
+                origin = element.position.lat+','+element.position.lng;
+                coordinates = origin;
+                inputStart.value = element.title
             }
             if (lista == 'listEnd') {
-                destino = element.position.lat+','+element.position.lng;
+                destination = element.position.lat+','+element.position.lng;
+                inputEnd.value = element.title
             }
             document.getElementById(lista).innerHTML = "";
-            if (origen && destino) {
+            if (origin && destination) {
                 document.getElementById('searching').disabled = false;
             }
         };
@@ -164,19 +176,21 @@ function addOptions(params, lista){
 }
 
 function searchPlace(place){
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            axios
-            .get('/api/search-place', { params: {q:  place} })
-            .then((response) => {
-                resolve(response.data)
-            })
-            .catch((error) => {
-                alert(error.data)
-            });
-        }, 1500);
-        
-    });
+  return new Promise((resolve) => {
+      axios
+        .get('/api/search-place', { params: {
+          q:  place,
+          in: 'countryCode:MEX',
+          at: origin
+          } 
+        })
+        .then((response) => {
+            resolve(response.data)
+        })
+        .catch((error) => {
+            alert(error.data)
+        });
+  });
 }
 
 function addCustomMarker(items){
@@ -230,7 +244,7 @@ var defaultLayers = platform.createDefaultLayers({
 // Step 2: initialize a map - this map is centered over Berlin
 var map = new H.Map(mapContainer,
   defaultLayers.vector.normal.map, {
-  center: {lat: 19.43195, lng: -99.13315},
+  center: {lat: coordinates[0], lng: coordinates[1]},
   zoom: 10,
   pixelRatio: window.devicePixelRatio || 1
 });
@@ -402,7 +416,7 @@ function addSummaryToPanel(route) {
   });
 
   var summaryDiv = document.createElement('div'),
-    content = '<b>Distancia total</b>: ' + distance + 'm. <br />' +
+    content = '<b>Distancia total</b>: ' + toKM(distance) + ' <br />' +
       '<b>Tiempo de viaje</b>: ' + toMMSS(duration) + ' (en el tráfico actual) <br />' +
       '<b>Precio total</b>: $' + total + ' <br />'; // Total casetas
 
@@ -444,30 +458,34 @@ function addManueversToPanel(route) {
 }
 
 function toMMSS(duration) {
-  return Math.floor(duration / 60) + ' minutos ' + (duration % 60) + ' segundos.';
+  return Math.floor(duration / 3600) + ' horas ' + Math.floor(duration / 360) + ' minutos.';
+}
+
+function toKM(distance) {
+  return Number(distance / 1000).toFixed(2) + ' Km ';
 }
 </script>
 
 <style>
-    .loader {
-        border: 8px solid #f3f3f3;
-        /* Light grey */
-        border-top: 8px solid #3498db;
-        /* Blue */
-        border-radius: 50%;
-        width: 16px;
-        height: 16px;
-        animation: spin 2s linear infinite;
-        display: none;
+  .loader {
+    border: 8px solid #f3f3f3;
+    /* Light grey */
+    border-top: 8px solid #3498db;
+    /* Blue */
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 2s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
     }
 
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
+    100% {
+      transform: rotate(360deg);
     }
+  }
 </style>
