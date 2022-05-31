@@ -40,4 +40,9 @@ return [
         ]
     ],
 
+    'inegi' => [
+        'api_key' => env('API_KEY_INEGI'),
+        'base_url' => env('BASE_URL_INEGI'),
+    ],
+
 ];

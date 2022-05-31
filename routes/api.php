@@ -75,3 +75,36 @@ Route::get('calculate-route', function (Request $request) {
 
     return $matrix->json();
 });
+
+Route::post('buscar-destino', function (Request $request) {
+
+    $params = http_build_query(
+        [
+            'buscar'    => $request->buscar,
+            'type'      => $request->type,
+            'num'       => $request->num,
+            'key'       => config('services.inegi.api_key'),
+        ]
+    );
+
+    $client = Http::post(config('services.inegi.base_url') . '/buscadestino?' . $params);
+
+    return $client->json();
+});
+
+Route::post('calcular-ruta', function (Request $request) {
+
+    $params = http_build_query(
+        [
+            'dest_i'    => $request->dest_i,
+            'dest_f'    => $request->dest_f,
+            'type'      => $request->type,
+            'v'         => $request->v,
+            'key'       => config('services.inegi.api_key'),
+        ]
+    );
+
+    $client = Http::post(config('services.inegi.base_url') . '/cuota?' . $params);
+
+    return $client->json();
+});
