@@ -14,7 +14,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    // return view('here-maps');
-    // return view('openstreetmap');
-    return view('inegi');
+    return view('welcome');
 });
+
+Route::get('/here-maps', function () {
+    return view('here-maps');
+})->name('here.maps');
+
+Route::get('/inegi-openstreetmap', function () {
+    return view('inegi-openstreetmap');
+})->name('openstreetmap');
+
+Route::get('/inegi-mapbox', function () {
+    return view('inegi-mapbox');
+})->name('mapbox');

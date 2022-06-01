@@ -1,507 +1,470 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-  <title>Easytrip</title>
-  <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
-  <link rel="stylesheet" type="text/css" href="demo.css" />
-  <link rel="stylesheet" type="text/css" href="styles.css" />
-  <link rel="stylesheet" type="text/css" href="../template.css" />
-  <script type="text/javascript" src='../test-credentials.js'></script>
-  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
-  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
-  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
-  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
-  <script src="{{ mix('js/app.js') }}" defer></script>
-  <style type="text/css">
-    .directions li span.arrow {
-      display: inline-block;
-      min-width: 28px;
-      min-height: 28px;
-      background-position: 0px;
-      background-image: url("https://heremaps.github.io/maps-api-for-javascript-examples/map-with-route-from-a-to-b/img/arrows.png");
-      position: relative;
-      top: 8px;
-    }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    .directions li span.depart {
-      background-position: -28px;
-    }
+    <title>Easytrip</title>
 
-    .directions li span.rightturn {
-      background-position: -224px;
-    }
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
-    .directions li span.leftturn {
-      background-position: -252px;
-    }
+    <!-- Styles -->
+    <style>
+        /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
+        html {
+            line-height: 1.15;
+            -webkit-text-size-adjust: 100%
+        }
 
-    .directions li span.arrive {
-      background-position: -1288px;
-    }
-  </style>
-  <script>
-    window.ENV_VARIABLE = 'developer.here.com'
-  </script>
-  <script src='../iframeheight.js'></script>
+        body {
+            margin: 0
+        }
+
+        a {
+            background-color: transparent
+        }
+
+        [hidden] {
+            display: none
+        }
+
+        html {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+            line-height: 1.5
+        }
+
+        *,
+        :after,
+        :before {
+            box-sizing: border-box;
+            border: 0 solid #e2e8f0
+        }
+
+        a {
+            color: inherit;
+            text-decoration: inherit
+        }
+
+        svg,
+        video {
+            display: block;
+            vertical-align: middle
+        }
+
+        video {
+            max-width: 100%;
+            height: auto
+        }
+
+        .bg-white {
+            --bg-opacity: 1;
+            background-color: #fff;
+            background-color: rgba(255, 255, 255, var(--bg-opacity))
+        }
+
+        .bg-gray-100 {
+            --bg-opacity: 1;
+            background-color: #f7fafc;
+            background-color: rgba(247, 250, 252, var(--bg-opacity))
+        }
+
+        .border-gray-200 {
+            --border-opacity: 1;
+            border-color: #edf2f7;
+            border-color: rgba(237, 242, 247, var(--border-opacity))
+        }
+
+        .border-t {
+            border-top-width: 1px
+        }
+
+        .flex {
+            display: flex
+        }
+
+        .grid {
+            display: grid
+        }
+
+        .hidden {
+            display: none
+        }
+
+        .items-center {
+            align-items: center
+        }
+
+        .justify-center {
+            justify-content: center
+        }
+
+        .font-semibold {
+            font-weight: 600
+        }
+
+        .h-5 {
+            height: 1.25rem
+        }
+
+        .h-8 {
+            height: 2rem
+        }
+
+        .h-16 {
+            height: 4rem
+        }
+
+        .text-sm {
+            font-size: .875rem
+        }
+
+        .text-lg {
+            font-size: 1.125rem
+        }
+
+        .leading-7 {
+            line-height: 1.75rem
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto
+        }
+
+        .ml-1 {
+            margin-left: .25rem
+        }
+
+        .mt-2 {
+            margin-top: .5rem
+        }
+
+        .mr-2 {
+            margin-right: .5rem
+        }
+
+        .ml-2 {
+            margin-left: .5rem
+        }
+
+        .mt-4 {
+            margin-top: 1rem
+        }
+
+        .ml-4 {
+            margin-left: 1rem
+        }
+
+        .mt-8 {
+            margin-top: 2rem
+        }
+
+        .ml-12 {
+            margin-left: 3rem
+        }
+
+        .-mt-px {
+            margin-top: -1px
+        }
+
+        .max-w-6xl {
+            max-width: 72rem
+        }
+
+        .min-h-screen {
+            min-height: 100vh
+        }
+
+        .overflow-hidden {
+            overflow: hidden
+        }
+
+        .p-6 {
+            padding: 1.5rem
+        }
+
+        .py-4 {
+            padding-top: 1rem;
+            padding-bottom: 1rem
+        }
+
+        .px-6 {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem
+        }
+
+        .pt-8 {
+            padding-top: 2rem
+        }
+
+        .fixed {
+            position: fixed
+        }
+
+        .relative {
+            position: relative
+        }
+
+        .top-0 {
+            top: 0
+        }
+
+        .right-0 {
+            right: 0
+        }
+
+        .shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06)
+        }
+
+        .text-center {
+            text-align: center
+        }
+
+        .text-gray-200 {
+            --text-opacity: 1;
+            color: #edf2f7;
+            color: rgba(237, 242, 247, var(--text-opacity))
+        }
+
+        .text-gray-300 {
+            --text-opacity: 1;
+            color: #e2e8f0;
+            color: rgba(226, 232, 240, var(--text-opacity))
+        }
+
+        .text-gray-400 {
+            --text-opacity: 1;
+            color: #cbd5e0;
+            color: rgba(203, 213, 224, var(--text-opacity))
+        }
+
+        .text-gray-500 {
+            --text-opacity: 1;
+            color: #a0aec0;
+            color: rgba(160, 174, 192, var(--text-opacity))
+        }
+
+        .text-gray-600 {
+            --text-opacity: 1;
+            color: #718096;
+            color: rgba(113, 128, 150, var(--text-opacity))
+        }
+
+        .text-gray-700 {
+            --text-opacity: 1;
+            color: #4a5568;
+            color: rgba(74, 85, 104, var(--text-opacity))
+        }
+
+        .text-gray-900 {
+            --text-opacity: 1;
+            color: #1a202c;
+            color: rgba(26, 32, 44, var(--text-opacity))
+        }
+
+        .underline {
+            text-decoration: underline
+        }
+
+        .antialiased {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale
+        }
+
+        .w-5 {
+            width: 1.25rem
+        }
+
+        .w-8 {
+            width: 2rem
+        }
+
+        .w-auto {
+            width: auto
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr))
+        }
+
+        @media (min-width:640px) {
+            .sm\:rounded-lg {
+                border-radius: .5rem
+            }
+
+            .sm\:block {
+                display: block
+            }
+
+            .sm\:items-center {
+                align-items: center
+            }
+
+            .sm\:justify-start {
+                justify-content: flex-start
+            }
+
+            .sm\:justify-between {
+                justify-content: space-between
+            }
+
+            .sm\:h-20 {
+                height: 5rem
+            }
+
+            .sm\:ml-0 {
+                margin-left: 0
+            }
+
+            .sm\:px-6 {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem
+            }
+
+            .sm\:pt-0 {
+                padding-top: 0
+            }
+
+            .sm\:text-left {
+                text-align: left
+            }
+
+            .sm\:text-right {
+                text-align: right
+            }
+        }
+
+        @media (min-width:768px) {
+            .md\:border-t-0 {
+                border-top-width: 0
+            }
+
+            .md\:border-l {
+                border-left-width: 1px
+            }
+
+            .md\:grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr))
+            }
+        }
+
+        @media (min-width:1024px) {
+            .lg\:px-8 {
+                padding-left: 2rem;
+                padding-right: 2rem
+            }
+        }
+
+        @media (prefers-color-scheme:dark) {
+            .dark\:bg-gray-800 {
+                --bg-opacity: 1;
+                background-color: #2d3748;
+                background-color: rgba(45, 55, 72, var(--bg-opacity))
+            }
+
+            .dark\:bg-gray-900 {
+                --bg-opacity: 1;
+                background-color: #1a202c;
+                background-color: rgba(26, 32, 44, var(--bg-opacity))
+            }
+
+            .dark\:border-gray-700 {
+                --border-opacity: 1;
+                border-color: #4a5568;
+                border-color: rgba(74, 85, 104, var(--border-opacity))
+            }
+
+            .dark\:text-white {
+                --text-opacity: 1;
+                color: #fff;
+                color: rgba(255, 255, 255, var(--text-opacity))
+            }
+
+            .dark\:text-gray-400 {
+                --text-opacity: 1;
+                color: #cbd5e0;
+                color: rgba(203, 213, 224, var(--text-opacity))
+            }
+        }
+
+    </style>
+
+    <style>
+        body {
+            font-family: 'Nunito';
+        }
+
+    </style>
 </head>
 
-<body id="markers-on-the-map">
-
-  <div style="display: flex;">
-    <label for="start">Inicio</label>
-    <input type="search" name="" id="start" value="Bosque de las Lomas, Ciudad de México">
-    <label for="end">Destino</label>
-    <input type="search" name="" id="end" value="Tepotzotlán, México">
-    <label for="mode">Camino Rápido</label>
-    <input type="radio" name="mode" id="fast" checked>
-    <label for="mode">Camino Corto</label>
-    <input type="radio" name="mode" id="short">
-    <button onclick="searchAddress()">ir</button>
-    <div class="loader"></div>
-  </div>
-
-  @php
-      $casetas = file_get_contents(base_path('easytrip.json'));
-  @endphp
-
-  <div id="map" style="width: 88rem; height: 40rem;"></div>
-  <div id="panel"></div>
-
-  <script type="text/javascript" src='demo.js'></script>
-</body>
-
-</html>
-
-<script>
-  function testing() {
-    axios.get('/api/near')
-    .then((res)=>{
-      console.log(res.data);
-    })
-  }
-
-  var origen = '';
-  var destino = '';
-  var total = 0;
-  const casetas = JSON.parse(@json($casetas))
-  
-  /**
- * Calculates and displays a car route from the Brandenburg Gate in the centre of Berlin
- * to Friedrichstraße Railway Station.
- *
- * A full list of available request parameters can be found in the Routing API documentation.
- * see: http://developer.here.com/rest-apis/documentation/routing/topics/resource-calculate-route.html
- *
- * @param {H.service.Platform} platform A stub class to access HERE services
- */
-function calculateRouteFromAtoB(platform) {
-  let mode = document.getElementById("fast").checked ? 'fast' : 'short';
-
-  var router = platform.getRoutingService(null, 8),
-      routeRequestParams = {
-        routingMode: mode,
-        transportMode: 'car',
-        origin: origen,
-        destination: destino,
-        return: 'polyline,turnByTurnActions,actions,instructions,travelSummary',
-        lang: 'es'
-      };
-
-  router.calculateRoute(
-    routeRequestParams,
-    onSuccess,
-    onError
-  );
-}
-
-let inputStart = document.getElementById('start');
-let inputEnd = document.getElementById('end');
-
-function searchAddress() {
-  document.getElementsByClassName("loader")[0].style.display = "block";
-  if (inputStart.value) {
-    setTimeout(() => {
-      geocodeStart(platform, inputStart.value)
-    }, 1000);
-   
-  }
-  if (inputEnd.value) {
-    setTimeout(() => {
-      geocodeEnd(platform, inputEnd.value)
-    }, 2000);
-  }
-}
-
-// Search geocoding input Inicio
-function geocodeStart(platform, start) {
-    var geocoder = platform.getSearchService(),
-        geocodingParameters = {
-          q: start
-        };
-
-    geocoder.geocode(
-      geocodingParameters,
-      onSuccessStart,
-      onError
-    );
-  }
-
-// Search geocoding input End
-function geocodeEnd(platform, end) {
-    var geocoder = platform.getSearchService(),
-        geocodingParameters = {
-          q: end
-        };
-
-    geocoder.geocode(
-      geocodingParameters,
-      onSuccessEnd,
-      onError
-    );
-  }
-
-function onSuccessStart(result) {
-  if (result.items.length > 0) {
-    let resultado = null;
-    resultado = result.items[0].position;
-    origen = resultado.lat+','+resultado.lng
-  }
-}
-
-function onSuccessEnd(result) {
-  if (result.items.length > 0) {
-    let res = null;
-    res = result.items[0].position;
-    destino = res.lat+','+res.lng
-    calculateRouteFromAtoB(platform);
-  }
-}
-
-/**
- * This function will be called once the Routing REST API provides a response
- * @param {Object} result A JSONP object representing the calculated route
- *
- * see: http://developer.here.com/rest-apis/documentation/routing/topics/resource-type-calculate-route.html
- */
-function onSuccess(result) {
-  if (result.hasOwnProperty('routes') && result.routes.length > 0) {
-
-      var route = result.routes[0];
-
-      /*
-      * The styling of the route response on the map is entirely under the developer's control.
-      * A representative styling can be found the full JS + HTML code of this example
-      * in the functions below:
-      */
-      addRouteShapeToMap(route);
-      addManueversToMap(route);
-      addWaypointsToPanel(route);
-      addManueversToPanel(route);
-      addSummaryToPanel(route);
-      // ... etc.
-  } else {
-    alert('Ruta no encontrada.')
-  }
-  document.getElementsByClassName("loader")[0].style.display = "none";
-}
-
-/**
- * This function will be called if a communication error occurs during the JSON-P request
- * @param {Object} error The error message received.
- */
-function onError(error) {
-  document.getElementsByClassName("loader")[0].style.display = "none";
-  alert('Can\'t reach the remote server');
-}
-
-/**
- * Boilerplate map initialization code starts below:
- */
-
-// set up containers for the map + panel
-var mapContainer = document.getElementById('map'),
-  routeInstructionsContainer = document.getElementById('panel');
-
-// Step 1: initialize communication with the platform
-// In your own code, replace variable window.apikey with your own apikey
-var platform = new H.service.Platform({
-  apikey: '{{ config('services.here.api_key') }}'
-});
-
-var defaultLayers = platform.createDefaultLayers({
-  lg: 'es'
-});
-
-// Step 2: initialize a map - this map is centered over Berlin
-var map = new H.Map(mapContainer,
-  defaultLayers.vector.normal.map, {
-  center: {lat: 19.43195, lng: -99.13315},
-  zoom: 10,
-  pixelRatio: window.devicePixelRatio || 1
-});
-
-// add a resize listener to make sure that the map occupies the whole container
-window.addEventListener('resize', () => map.getViewPort().resize());
-
-// Step 3: make the map interactive
-// MapEvents enables the event system
-// Behavior implements default interactions for pan/zoom (also on mobile touch environments)
-var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
-
-// Create the default UI components
-var ui = H.ui.UI.createDefault(map, defaultLayers, 'es-ES');
-
-// Hold a reference to any infobubble opened
-var bubble;
-
-/**
- * Opens/Closes a infobubble
- * @param {H.geo.Point} position The location on the map.
- * @param {String} text          The contents of the infobubble.
- */
-function openBubble(position, text) {
-  if (!bubble) {
-    bubble = new H.ui.InfoBubble(
-      position,
-      // The FO property holds the province name.
-      {content: text});
-    ui.addBubble(bubble);
-  } else {
-    bubble.setPosition(position);
-    bubble.setContent(text);
-    bubble.open();
-  }
-}
-
-/**
- * Creates a H.map.Polyline from the shape of the route and adds it to the map.
- * @param {Object} route A route as received from the H.service.RoutingService
- */
-function addRouteShapeToMap(route) {
-  if (route.sections) {
-
-    map.removeObjects(map.getObjects ());
-
-    route.sections.forEach((section) => {
-      // decode LineString from the flexible polyline
-      let linestring = H.geo.LineString.fromFlexiblePolyline(section.polyline);
-
-      // Create a polyline to display the route:
-      let polyline = new H.map.Polyline(linestring, {
-        style: {
-          lineWidth: 4,
-          strokeColor: 'rgba(0, 128, 255, 0.7)'
-        }
-      });
-
-      // Add the polyline to the map
-      map.addObject(polyline);
-      // And zoom to its bounding rectangle
-      map.getViewModel().setLookAtData({
-        bounds: polyline.getBoundingBox()
-      });
-    });
-  }
-}
-
-/**
- * Creates a series of H.map.Marker points from the route and adds them to the map.
- * @param {Object} route A route as received from the H.service.RoutingService
- */
-function addManueversToMap(route) {  
-  total = 0;
-  route.sections.forEach((section) => {
-    let poly = H.geo.LineString.fromFlexiblePolyline(section.polyline).getLatLngAltArray();
-    let intersection = [];
-
-    // Match coordenadas casetas con coordenadas ruta
-    for (let i = 0; i < poly.length; i = i+3) {
-      casetas.map(function(caseta) {
-        let point1 = new H.geo.Point(poly[i], poly[i + 1]),
-        point2 = new H.geo.Point(caseta.Latitud, caseta.Longitud);
-
-        distance = point1.distance(point2);
-        if (distance <= 50) {
-          intersection.push(caseta)
-        }
-      })
-      
-    }
-
-    uniqueArray = intersection.filter(function(item, pos, self) {
-        return self.indexOf(item) == pos;
-    })
-
-    if (uniqueArray.length > 0) {
-      uniqueArray.forEach((element) => {
-        var svgCustom = `<svg xmlns="http://www.w3.org/2000/svg" style="color: red;" width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-          </svg>`,
-              dotIconCustom = new H.map.Icon(svgCustom, {anchor: {x:8, y:8}}),
-              group = new H.map.Group(),
-              i,
-              j;
-
-              // Add custom marker
-              var marker = new H.map.Marker({
-                  lat: element.Latitud,
-                  lng: element.Longitud
-                },
-                  {icon: dotIconCustom});
-              marker.instruction = element.Name;
-              group.addObject(marker);
-
-              group.addEventListener('tap', function (evt) {
-            map.setCenter(evt.target.getGeometry());
-            openBubble(evt.target.getGeometry(), evt.target.instruction);
-          }, false);
-
-          map.addObject(group);
-
-          total += element.price;
-      });
-    }
-
-    var svgMarkup = '<svg width="18" height="18" ' +
-        'xmlns="http://www.w3.org/2000/svg">' +
-        '<circle cx="8" cy="8" r="8" ' +
-          'fill="#1b468d" stroke="white" stroke-width="1" />' +
-        '</svg>',
-    dotIcon = new H.map.Icon(svgMarkup, {anchor: {x:8, y:8}}),
-    group = new H.map.Group(),
-    i,
-    j;
-
-    route.sections.forEach((section) => {
-        let poly = H.geo.LineString.fromFlexiblePolyline(section.polyline).getLatLngAltArray();
-
-        let actions = section.actions;
-        // Add a marker for each maneuver
-        for (i = 0; i < actions.length; i += 1) {
-          let action = actions[i];
-          var marker = new H.map.Marker({
-            lat: poly[action.offset * 3],
-            lng: poly[action.offset * 3 + 1]},
-            {icon: dotIcon});
-          marker.instruction = action.instruction;
-          group.addObject(marker);
-        }
-
-        group.addEventListener('tap', function (evt) {
-          map.setCenter(evt.target.getGeometry());
-          openBubble(evt.target.getGeometry(), evt.target.instruction);
-        }, false);
-
-        // Add the maneuvers group to the map
-        map.addObject(group);
-      });
-    
-  });
-}
-
-/**
- * Creates a series of H.map.Marker points from the route and adds them to the map.
- * @param {Object} route A route as received from the H.service.RoutingService
- */
-function addWaypointsToPanel(route) {
-  var nodeH3 = document.createElement('h3'),
-    labels = [];
-
-  route.sections.forEach((section) => {
-    labels.push(
-      section.turnByTurnActions[0].nextRoad.name[0].value)
-    labels.push(
-      section.turnByTurnActions[section.turnByTurnActions.length - 1].currentRoad.name[0].value)
-  });
-
-  nodeH3.textContent = labels.join(' - ');
-  routeInstructionsContainer.innerHTML = '';
-  routeInstructionsContainer.appendChild(nodeH3);
-}
-
-/**
- * Creates a series of H.map.Marker points from the route and adds them to the map.
- * @param {Object} route A route as received from the H.service.RoutingService
- */
-function addSummaryToPanel(route) {
-  let duration = 0,
-    distance = 0;
-
-  route.sections.forEach((section) => {
-    distance += section.travelSummary.length;
-    duration += section.travelSummary.duration;
-  });
-
-  var summaryDiv = document.createElement('div'),
-    content = '<b>Distancia total</b>: ' + distance + 'm. <br />' +
-      '<b>Tiempo de viaje</b>: ' + toMMSS(duration) + ' (in current traffic) <br />' +
-      '<b>Precio total</b>: $' + total + ' <br />'; // Total casetas
-
-  summaryDiv.style.fontSize = 'small';
-  summaryDiv.style.marginLeft = '5%';
-  summaryDiv.style.marginRight = '5%';
-  summaryDiv.innerHTML = content;
-  routeInstructionsContainer.appendChild(summaryDiv);
-}
-
-/**
- * Creates a series of H.map.Marker points from the route and adds them to the map.
- * @param {Object} route A route as received from the H.service.RoutingService
- */
-function addManueversToPanel(route) {
-  var nodeOL = document.createElement('ol');
-
-  nodeOL.style.fontSize = 'small';
-  nodeOL.style.marginLeft ='5%';
-  nodeOL.style.marginRight ='5%';
-  nodeOL.className = 'directions';
-
-  route.sections.forEach((section) => {
-    section.actions.forEach((action, idx) => {
-      var li = document.createElement('li'),
-        spanArrow = document.createElement('span'),
-        spanInstruction = document.createElement('span');
-
-      spanArrow.className = 'arrow ' + (action.direction || '') + action.action;
-      spanInstruction.innerHTML = section.actions[idx].instruction;
-      li.appendChild(spanArrow);
-      li.appendChild(spanInstruction);
-
-      nodeOL.appendChild(li);
-    });
-  });
-
-  routeInstructionsContainer.appendChild(nodeOL);
-}
-
-function toMMSS(duration) {
-  return Math.floor(duration / 60) + ' minutes ' + (duration % 60) + ' seconds.';
-}
-</script>
-
-<style>
-  .loader {
-    border: 8px solid #f3f3f3;
-    /* Light grey */
-    border-top: 8px solid #3498db;
-    /* Blue */
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    animation: spin 2s linear infinite;
-    display: none;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-</style>
+<body class="antialiased">
+    <div
+        class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center sm:pt-0">
+        @if (Route::has('login'))
+            <div class="hidden fixed top-0 right-0 px-6 py-4 sm:block">
+                @auth
+                    <a href="{{ url('/home') }}" class="text-sm text-gray-700 underline">Home</a>
+                @else
+                    <a href="{{ route('login') }}" class="text-sm text-gray-700 underline">Login</a>
+
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 underline">Register</a>
+                    @endif
+            @endif
+        </div>
+        @endif
+
+        <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
+            <div class="mt-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
+                <div class="grid grid-cols-1 md:grid-cols-2">
+                    <div class="p-6 border-t border-gray-200 dark:border-gray-700 md:border-l">
+                        <div class="flex items-center">
+                            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" viewBox="0 0 24 24" class="w-8 h-8 text-gray-500">
+                                <path
+                                    d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            <a class="ml-4 text-lg leading-7 font-semibold text-gray-900 dark:text-white" href="{{route('here.maps')}}">Here Maps</a>
+                        </div>
+                    </div>
+
+                    <div class="p-6 border-t border-gray-200 dark:border-gray-700 md:border-l">
+                        <div class="flex items-center">
+                            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" viewBox="0 0 24 24" class="w-8 h-8 text-gray-500">
+                                <path
+                                    d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            <a class="ml-4 text-lg leading-7 font-semibold text-gray-900 dark:text-white" href="{{route('openstreetmap')}}">OpenStreetMap</a>
+                        </div>
+                    </div>
+
+                    <div class="p-6 border-t border-gray-200 dark:border-gray-700 md:border-l">
+                        <div class="flex items-center">
+                            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" viewBox="0 0 24 24" class="w-8 h-8 text-gray-500">
+                                <path
+                                    d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            <a class="ml-4 text-lg leading-7 font-semibold text-gray-900 dark:text-white" href="{{route('mapbox')}}">MapBox</a>
+                        </div>
+                    </div>
+
+                    <div class="p-6 border-t border-gray-200 dark:border-gray-700 md:border-l">
+                        <div class="flex items-center">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </body>
+
+    </html>

@@ -5,6 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+        integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+        crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+        integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+        crossorigin=""></script>
+
     <title>INEGI</title>
     <script src="{{ mix('js/app.js') }}" defer></script>
 </head>
@@ -40,6 +49,21 @@
 <script>
     let inputStart = document.getElementById('start');
     let inputEnd = document.getElementById('end');
+    let panel = document.getElementById('panel');
+    var map = L.map('map').setView([19.432, -99.134], 11);
+    var polyline = null;
+    let markers = [];
+    let mark1 = null;
+    let mark2 = null;
+
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox/streets-v11',
+        tileSize: 512,
+        zoomOffset: -1,
+        accessToken: 'pk.eyJ1IjoiZ2VybWFuaW83IiwiYSI6ImNsM2tyMHFuZDBlejMza3Bnd2Q1N2F2dzYifQ.x7Pao_41LrGYXvxkGYjY5w',
+    }).addTo(map);
 
     function loadingDisplay() {
         document.getElementsByClassName("loader")[0].style.display = "block";
@@ -80,13 +104,28 @@
             var li = document.createElement("li");
             li.appendChild(document.createTextNode(element.nombre));
             li.onclick = function() {
+                if (polyline) {
+                    map.removeLayer(polyline)
+                }
                 if (lista == 'listStart') {
+                    if (mark1) {
+                        map.removeLayer(mark1)
+                    }
                     origin = element.id_dest;
+                    let geojson = JSON.parse(element.geojson)
+                    mark1 = L.marker([geojson.coordinates[1], geojson.coordinates[0]])
+                    map.addLayer(mark1);
                     coordinates = origin;
                     inputStart.value = element.nombre
                 }
                 if (lista == 'listEnd') {
+                    if (mark2) {
+                        map.removeLayer(mark2)
+                    }
                     destination = element.id_dest;
+                    let geojson = JSON.parse(element.geojson)
+                    mark2 = L.marker([geojson.coordinates[1], geojson.coordinates[0]])
+                    map.addLayer(mark2);
                     inputEnd.value = element.nombre
                 }
                 document.getElementById(lista).innerHTML = "";
@@ -103,8 +142,18 @@
         if (origin && destination) {
             const result = await calculateRoute();
             if (result.data) {
+                panel.innerHTML = '';
                 let geojson = JSON.parse(result.data.geojson)
-                console.log(geojson.coordinates);
+                latlngs = [];
+                geojson.coordinates.map(function(item) {
+                    item.map(function(element) {
+                        latlngs.push([element[1], element[0]]);
+                    })
+                });
+                polyline = L.polyline(latlngs, {
+                    color: 'red'
+                }).addTo(map);
+                map.fitBounds(polyline.getBounds());
                 this.showInfo(result.data);
             }
         }
@@ -112,8 +161,6 @@
     }
 
     function showInfo(info) {
-        let panel = document.getElementById('panel');
-
         var summaryDiv = document.createElement('div'),
             content = '<b>Distancia total</b>: ' + info.long_km + ' Km <br />' +
             '<b>Tiempo de viaje</b>: ' + info.tiempo_min + ' minutos. <br />' +
