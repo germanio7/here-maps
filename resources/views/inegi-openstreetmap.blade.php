@@ -50,12 +50,12 @@
     let inputStart = document.getElementById('start');
     let inputEnd = document.getElementById('end');
     let panel = document.getElementById('panel');
-    var map = L.map('map').setView([19.432, -99.134], 11);
-    var polyline = null;
+    var map = L.map('map').setView([19.432, -99.134], 5);
     var geojson = null;
     let markers = [];
     let mark1 = null;
     let mark2 = null;
+    let totalCasetas = 0;
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -101,6 +101,7 @@
             var li = document.createElement("li");
             li.appendChild(document.createTextNode(element.nombre));
             li.onclick = function() {
+                panel.innerHTML = '';
                 if (markers) {
                     markers.map(function(item) {
                         map.removeLayer(item);
@@ -108,9 +109,6 @@
                 }
                 if (geojson) {
                     map.removeLayer(geojson)
-                }
-                if (polyline) {
-                    map.removeLayer(polyline)
                 }
                 if (lista == 'listStart') {
                     if (mark1) {
@@ -144,6 +142,15 @@
 
     async function searchRoute() {
         loadingDisplay();
+        panel.innerHTML = '';
+        if (markers) {
+            markers.map(function(item) {
+                map.removeLayer(item);
+            });
+        }
+        if (geojson) {
+            map.removeLayer(geojson)
+        }
         if (origin && destination) {
             const route = await calculateRoute();
             const details = await calculateRouteDetails();
@@ -151,6 +158,7 @@
 
                 details.data.map(function(item) {
                     this.addDetailsPanel(item);
+                    totalCasetas += item.costo_caseta;
 
                     if (item.punto_caseta) {
                         let punto_caseta = JSON.parse(item.punto_caseta);
@@ -180,7 +188,8 @@
         var summaryDiv = document.createElement('div'),
             content = '<b>Distancia total</b>: ' + info.long_km + ' Km <br />' +
             '<b>Tiempo de viaje</b>: ' + info.tiempo_min + ' minutos. <br />' +
-            '<b>Precio total</b>: $' + info.costo_caseta + ' <br />';
+            // '<b>Precio total</b>: $' + info.costo_caseta + ' <br />' +
+            '<b>Precio total</b>: $' + totalCasetas + ' <br />';
 
         summaryDiv.style.fontSize = 'small';
         summaryDiv.style.marginLeft = '5%';
