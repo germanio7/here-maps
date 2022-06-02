@@ -50,7 +50,7 @@
     let inputStart = document.getElementById('start');
     let inputEnd = document.getElementById('end');
     let panel = document.getElementById('panel');
-    var map = L.map('map').setView([19.432, -99.134], 5);
+    var map = L.map('map').setView([19.432, -99.134], 11);
     var geojson = null;
     let markers = [];
     let mark1 = null;
@@ -120,7 +120,7 @@
                     let point = JSON.parse(element.geojson)
                     mark1 = L.marker([point.coordinates[1], point.coordinates[0]])
                     map.addLayer(mark1);
-                    coordinates = origin;
+                    map.panTo(mark1.getLatLng());
                     inputStart.value = element.nombre
                 }
                 if (lista == 'listEnd') {
@@ -131,6 +131,7 @@
                     let point = JSON.parse(element.geojson)
                     mark2 = L.marker([point.coordinates[1], point.coordinates[0]])
                     map.addLayer(mark2);
+                    map.panTo(mark2.getLatLng());
                     inputEnd.value = element.nombre
                 }
                 document.getElementById(lista).innerHTML = "";
@@ -178,21 +179,21 @@
                 }).addTo(map);
 
                 map.fitBounds(geojson.getBounds());
-                this.showInfo(route.data);
+                this.showInfo(route);
             }
         }
         loadingHidden()
     }
 
     function showInfo(info) {
-        var divider = document.createElement('hr');
-        panel.appendChild(divider);
-
         var summaryDiv = document.createElement('div'),
-            content = '<b>Distancia total</b>: ' + info.long_km + ' Km <br />' +
-            '<b>Tiempo de viaje</b>: ' + info.tiempo_min + ' minutos. <br />' +
-            // '<b>Precio total</b>: $' + info.costo_caseta + ' <br />' +
-            '<b>Precio total</b>: $' + totalCasetas + ' <br />';
+            content = '<hr />' +
+            '<b>Distancia total</b>: ' + info.data.long_km + ' Km <br />' +
+            '<b>Tiempo de viaje</b>: ' + info.data.tiempo_min + ' minutos. <br />' +
+            // '<b>Precio total</b>: $' + info.data.costo_caseta + ' <br />' +
+            '<b>Precio total</b>: $' + totalCasetas + ' <br />' +
+            '<hr />' +
+            '<b>Info</b>: ' + info.meta.fuente + ' <br />';
 
         summaryDiv.style.fontSize = 'small';
         summaryDiv.style.marginLeft = '5%';
