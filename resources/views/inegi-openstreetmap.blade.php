@@ -71,6 +71,7 @@
 
     async function buscar(value, lista) {
         panel.innerHTML = '';
+        totalCasetas = 0;
         const results = await searchPlace(value);
         addOptions(results.data, lista)
         loadingHidden()
@@ -102,6 +103,7 @@
             li.appendChild(document.createTextNode(element.nombre));
             li.onclick = function() {
                 panel.innerHTML = '';
+                totalCasetas = 0;
                 if (markers) {
                     markers.map(function(item) {
                         map.removeLayer(item);
@@ -143,6 +145,7 @@
     async function searchRoute() {
         loadingDisplay();
         panel.innerHTML = '';
+        totalCasetas = 0;
         if (markers) {
             markers.map(function(item) {
                 map.removeLayer(item);
