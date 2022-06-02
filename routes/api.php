@@ -108,3 +108,20 @@ Route::post('calcular-ruta', function (Request $request) {
 
     return $client->json();
 });
+
+Route::post('detalles-calcular-ruta', function (Request $request) {
+
+    $params = http_build_query(
+        [
+            'dest_i'    => $request->dest_i,
+            'dest_f'    => $request->dest_f,
+            'type'      => $request->type,
+            'v'         => $request->v,
+            'key'       => config('services.inegi.api_key'),
+        ]
+    );
+
+    $client = Http::post(config('services.inegi.base_url') . '/detalle_c?' . $params);
+
+    return $client->json();
+});

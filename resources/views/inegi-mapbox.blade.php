@@ -52,6 +52,7 @@
     let panel = document.getElementById('panel');
     var map = L.map('map').setView([19.432, -99.134], 11);
     var polyline = null;
+    var geojson = null;
     let markers = [];
     let mark1 = null;
     let mark2 = null;
@@ -74,6 +75,7 @@
     }
 
     async function buscar(value, lista) {
+        panel.innerHTML = '';
         const results = await searchPlace(value);
         addOptions(results.data, lista)
         loadingHidden()
@@ -104,6 +106,14 @@
             var li = document.createElement("li");
             li.appendChild(document.createTextNode(element.nombre));
             li.onclick = function() {
+                if (markers) {
+                    markers.map(function(item) {
+                        map.removeLayer(item);
+                    });
+                }
+                if (geojson) {
+                    map.removeLayer(geojson)
+                }
                 if (polyline) {
                     map.removeLayer(polyline)
                 }
@@ -112,8 +122,8 @@
                         map.removeLayer(mark1)
                     }
                     origin = element.id_dest;
-                    let geojson = JSON.parse(element.geojson)
-                    mark1 = L.marker([geojson.coordinates[1], geojson.coordinates[0]])
+                    let point = JSON.parse(element.geojson)
+                    mark1 = L.marker([point.coordinates[1], point.coordinates[0]])
                     map.addLayer(mark1);
                     coordinates = origin;
                     inputStart.value = element.nombre
@@ -123,8 +133,8 @@
                         map.removeLayer(mark2)
                     }
                     destination = element.id_dest;
-                    let geojson = JSON.parse(element.geojson)
-                    mark2 = L.marker([geojson.coordinates[1], geojson.coordinates[0]])
+                    let point = JSON.parse(element.geojson)
+                    mark2 = L.marker([point.coordinates[1], point.coordinates[0]])
                     map.addLayer(mark2);
                     inputEnd.value = element.nombre
                 }
@@ -138,33 +148,55 @@
     }
 
     async function searchRoute() {
-        loadingDisplay()
+        loadingDisplay();
         if (origin && destination) {
-            const result = await calculateRoute();
-            if (result.data) {
-                panel.innerHTML = '';
-                let geojson = JSON.parse(result.data.geojson)
-                latlngs = [];
-                geojson.coordinates.map(function(item) {
-                    item.map(function(element) {
-                        latlngs.push([element[1], element[0]]);
-                    })
-                });
-                polyline = L.polyline(latlngs, {
+            const route = await calculateRoute();
+            const details = await calculateRouteDetails();
+            if (details.data && route.data) {
+
+                details.data.map(function(item) {
+                    this.addDetailsPanel(item);
+
+                    if (item.punto_caseta) {
+                        let punto_caseta = JSON.parse(item.punto_caseta);
+                        mark = L.marker([punto_caseta.coordinates[1], punto_caseta.coordinates[0]]);
+                        markers.push(mark);
+                        mark.addTo(map)
+                            .bindPopup(item.direccion + ' Costo: $' + item.costo_caseta);
+                    }
+                })
+
+                var coordinates = JSON.parse(route.data.geojson);
+                geojson = L.geoJSON(coordinates, {
                     color: 'red'
                 }).addTo(map);
-                map.fitBounds(polyline.getBounds());
-                this.showInfo(result.data);
+
+                map.fitBounds(geojson.getBounds());
+                this.showInfo(route.data);
             }
         }
         loadingHidden()
     }
 
     function showInfo(info) {
+        var divider = document.createElement('hr');
+        panel.appendChild(divider);
+
         var summaryDiv = document.createElement('div'),
             content = '<b>Distancia total</b>: ' + info.long_km + ' Km <br />' +
             '<b>Tiempo de viaje</b>: ' + info.tiempo_min + ' minutos. <br />' +
             '<b>Precio total</b>: $' + info.costo_caseta + ' <br />';
+
+        summaryDiv.style.fontSize = 'small';
+        summaryDiv.style.marginLeft = '5%';
+        summaryDiv.style.marginRight = '5%';
+        summaryDiv.innerHTML = content;
+        panel.appendChild(summaryDiv);
+    }
+
+    function addDetailsPanel(detail) {
+        var summaryDiv = document.createElement('div'),
+            content = '<b>Maniobra</b>: ' + detail.direccion + '<br />';
 
         summaryDiv.style.fontSize = 'small';
         summaryDiv.style.marginLeft = '5%';
@@ -178,6 +210,25 @@
         return new Promise((resolve) => {
             axios
                 .post('/api/calcular-ruta', {
+                    dest_i: origin,
+                    dest_f: destination,
+                    type: 'json',
+                    v: 1,
+                })
+                .then((response) => {
+                    resolve(response.data)
+                })
+                .catch((error) => {
+                    alert(error.data)
+                });
+        });
+    }
+
+    function calculateRouteDetails() {
+
+        return new Promise((resolve) => {
+            axios
+                .post('/api/detalles-calcular-ruta', {
                     dest_i: origin,
                     dest_f: destination,
                     type: 'json',
