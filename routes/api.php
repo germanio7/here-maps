@@ -30,6 +30,15 @@ Route::get('search-place', function (Request $request) {
     return $client->json();
 });
 
+Route::get('geocode', function (Request $request) {
+    $client = Http::get(config('services.here.geocode.base_url'), [
+        'apiKey'            => config('services.here.api_key'),
+        'q'                 => $request->q,
+        'in'                => 'countryCode:MEX'
+    ]);
+    return $client->json();
+});
+
 Route::get('calculate-route', function (Request $request) {
     $client = Http::get(config('services.here.routing.base_url'), [
         'apiKey'            => config('services.here.api_key'),
@@ -92,10 +101,33 @@ Route::post('buscar-destino', function (Request $request) {
     return $client->json();
 });
 
+Route::post('buscar-linea', function (Request $request) {
+
+    $params = http_build_query(
+        [
+            'escala'    => 10000000,
+            'type'      => 'json',
+            'x'         => $request->x,
+            'y'         => $request->y,
+            'key'       => config('services.inegi.api_key'),
+        ]
+    );
+
+    $client = Http::post(config('services.inegi.base_url') . '/buscalinea?' . $params);
+
+    return $client->json();
+});
+
 Route::post('calcular-ruta', function (Request $request) {
 
     $params = http_build_query(
         [
+            'id_i'      => $request->id_i,
+            'source_i'  => $request->source_i,
+            'target_i'  => $request->target_i,
+            'id_f'      => $request->id_f,
+            'source_f'  => $request->source_f,
+            'target_f'  => $request->target_f,
             'dest_i'    => $request->dest_i,
             'dest_f'    => $request->dest_f,
             'type'      => $request->type,
@@ -113,6 +145,12 @@ Route::post('detalles-calcular-ruta', function (Request $request) {
 
     $params = http_build_query(
         [
+            'id_i'      => $request->id_i,
+            'source_i'  => $request->source_i,
+            'target_i'  => $request->target_i,
+            'id_f'      => $request->id_f,
+            'source_f'  => $request->source_f,
+            'target_f'  => $request->target_f,
             'dest_i'    => $request->dest_i,
             'dest_f'    => $request->dest_f,
             'type'      => $request->type,

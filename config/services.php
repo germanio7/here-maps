@@ -37,6 +37,9 @@ return [
         ],
         'search'  => [
             'base_url' => env('BASE_URL_HERE_SEARCH')
+        ],
+        'geocode'  => [
+            'base_url' => env('BASE_URL_HERE_GEOCODE')
         ]
     ],
 

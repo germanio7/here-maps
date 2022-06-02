@@ -35,7 +35,7 @@
     </div>
 
     <div style="display: flex;">
-        <button disabled id="searching" onclick="searchRoute()">Buscar ruta</button>
+        <button disabled id="searching" onclick="searchRoute()">Calcular ruta</button>
         <div class="loader"></div>
     </div>
 
@@ -56,6 +56,8 @@
     let mark1 = null;
     let mark2 = null;
     let totalCasetas = 0;
+    var origin = null;
+    var destination = null;
 
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -77,9 +79,46 @@
     async function buscar(value, lista) {
         panel.innerHTML = '';
         totalCasetas = 0;
-        const results = await searchPlace(value);
-        addOptions(results.data, lista)
+        // const results = await searchPlace(value);
+        const results = await searchGeocode(value);
+        // addOptions(results.data, lista)
+
+        addOptionsForGeocode(results.items, lista)
+
         loadingHidden()
+    }
+
+    function searchGeocode(place) {
+        return new Promise((resolve) => {
+            axios
+                .get('/api/geocode', {
+                    params: {
+                        q: place
+                    }
+                })
+                .then((response) => {
+                    resolve(response.data)
+                })
+                .catch((error) => {
+                    alert(error.data)
+                });
+        });
+    }
+
+    function searchLine(x, y) {
+        return new Promise((resolve) => {
+            axios
+                .post('/api/buscar-linea', {
+                    x: x,
+                    y: y,
+                })
+                .then((response) => {
+                    resolve(response.data)
+                })
+                .catch((error) => {
+                    alert(error.data)
+                });
+        });
     }
 
     function searchPlace(place) {
@@ -97,6 +136,71 @@
                     alert(error.data)
                 });
         });
+    }
+
+    function addOptionsForGeocode(params, lista) {
+        let list = document.getElementById(lista);
+        list.innerHTML = "";
+
+        params.forEach((element) => {
+            addMarker(element, list, lista);
+        })
+    }
+
+    function addMarker(element, list, lista) {
+        var li = document.createElement("li");
+        li.appendChild(document.createTextNode(element.title));
+        li.onclick = async function() {
+            panel.innerHTML = '';
+            totalCasetas = 0;
+            if (markers) {
+                markers.map(function(item) {
+                    map.removeLayer(item);
+                });
+            }
+            if (geojson) {
+                map.removeLayer(geojson)
+            }
+            if (lista == 'listStart') {
+                if (mark1) {
+                    map.removeLayer(mark1)
+                }
+
+                const line1 = await searchLine(element.position.lng, element.position.lat);
+                origin = {
+                    id_routing_net: line1.data.id_routing_net,
+                    source: line1.data.source,
+                    target: line1.data.target,
+                }
+
+                mark1 = L.marker([element.position.lat, element.position.lng])
+                map.addLayer(mark1);
+                map.panTo(mark1.getLatLng());
+                inputStart.value = element.title
+            }
+            if (lista == 'listEnd') {
+                if (mark2) {
+                    map.removeLayer(mark2)
+                }
+
+                const line2 = await searchLine(element.position.lng, element.position.lat);
+                destination = {
+                    id_routing_net: line2.data.id_routing_net,
+                    source: line2.data.source,
+                    target: line2.data.target,
+                }
+
+                mark2 = L.marker([element.position.lat, element.position.lng])
+                map.addLayer(mark2);
+                map.panTo(mark2.getLatLng());
+                inputEnd.value = element.title
+            }
+            document.getElementById(lista).innerHTML = "";
+            if (origin || destination) {
+                document.getElementById('searching').disabled = false;
+            }
+        };
+        list.appendChild(li);
     }
 
     function addOptions(params, lista) {
@@ -121,7 +225,6 @@
                     if (mark1) {
                         map.removeLayer(mark1)
                     }
-                    origin = element.id_dest;
                     let point = JSON.parse(element.geojson)
                     mark1 = L.marker([point.coordinates[1], point.coordinates[0]])
                     map.addLayer(mark1);
@@ -132,7 +235,6 @@
                     if (mark2) {
                         map.removeLayer(mark2)
                     }
-                    destination = element.id_dest;
                     let point = JSON.parse(element.geojson)
                     mark2 = L.marker([point.coordinates[1], point.coordinates[0]])
                     map.addLayer(mark2);
@@ -223,8 +325,12 @@
         return new Promise((resolve) => {
             axios
                 .post('/api/calcular-ruta', {
-                    dest_i: origin,
-                    dest_f: destination,
+                    id_i: origin.id_routing_net,
+                    source_i: origin.source,
+                    target_i: origin.target,
+                    id_f: destination.id_routing_net,
+                    source_f: destination.source,
+                    target_f: destination.target,
                     type: 'json',
                     v: 1,
                 })
@@ -242,8 +348,12 @@
         return new Promise((resolve) => {
             axios
                 .post('/api/detalles-calcular-ruta', {
-                    dest_i: origin,
-                    dest_f: destination,
+                    id_i: origin.id_routing_net,
+                    source_i: origin.source,
+                    target_i: origin.target,
+                    id_f: destination.id_routing_net,
+                    source_f: destination.source,
+                    target_f: destination.target,
                     type: 'json',
                     v: 1,
                 })
