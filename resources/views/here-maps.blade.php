@@ -53,12 +53,12 @@
         <div style="display: flex;">
             <div style="display: flex-1;">
                 <label for="start">Inicio</label>
-                <input onkeyup="buscar(value, 'listStart'); loadingDisplay()" type="search" name="" id="start" value="">
+                <input type="search" name="" id="start" value="">
                 <ul style="cursor: pointer;" id="listStart"></ul>
             </div>
             <div style="display: flex-1;">
                 <label for="end">Destino</label>
-                <input onkeyup="buscar(value, 'listEnd'); loadingDisplay()" type="search" name="" id="end" value="">
+                <input type="search" name="" id="end" value="">
                 <ul id="listEnd" style="cursor: pointer;"></ul>
             </div>
             <label for="mode">Camino Rápido</label>
@@ -133,6 +133,20 @@
         addOptions(results.items, lista)
         loadingHidden()
     }
+
+    inputStart.addEventListener('keyup', function(e) {
+        loadingDisplay()
+        setTimeout(() => {
+            buscar(e.target.value, 'listStart');
+        }, 100);
+    });
+
+    inputEnd.addEventListener('keyup', function(e) {
+        loadingDisplay()
+        setTimeout(() => {
+            buscar(e.target.value, 'listEnd');
+        }, 100);
+    })
 
     async function searchRoute() {
         loadingDisplay()
@@ -249,6 +263,13 @@
     }
 
     async function addCustomMarker(items) {
+        var nodeOL = document.createElement('ol');
+
+        nodeOL.style.fontSize = 'small';
+        nodeOL.style.marginLeft = '5%';
+        nodeOL.style.marginRight = '5%';
+        nodeOL.className = 'directions';
+
         items.forEach(element => {
             var svgCustom = `<svg xmlns="http://www.w3.org/2000/svg" style="color: red;" width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
@@ -280,7 +301,20 @@
             }, false);
 
             map.addObject(group);
+
+            var li = document.createElement('li'),
+                spanArrow = document.createElement('span'),
+                spanInstruction = document.createElement('span');
+
+            spanArrow.className = 'arrow up';
+            spanInstruction.innerHTML = element.description + '. Costo: $' + element.costo;
+            li.appendChild(spanArrow);
+            li.appendChild(spanInstruction);
+
+            nodeOL.appendChild(li);
         });
+
+        routeInstructionsContainer.appendChild(nodeOL);
     }
 
     /**
@@ -402,7 +436,7 @@
 
                         distance = point1.distance(point2);
 
-                        if (distance <= 5) {
+                        if (distance <= 7) {
                             let auxCaseta = Object.assign({
                                 latitud: punto_caseta.coordinates[1],
                                 longitud: punto_caseta.coordinates[0],
